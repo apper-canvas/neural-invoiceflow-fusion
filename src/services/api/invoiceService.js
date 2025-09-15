@@ -21,7 +21,8 @@ export const invoiceService = {
           {"field": {"Name": "subtotal_c"}},
           {"field": {"Name": "tax_c"}},
           {"field": {"Name": "total_c"}},
-          {"field": {"Name": "notes_c"}},
+{"field": {"Name": "notes_c"}},
+          {"field": {"Name": "remarks_c"}},
           {"field": {"Name": "Tags"}}
         ],
         orderBy: [{"fieldName": "issue_date_c", "sorttype": "DESC"}]
@@ -63,7 +64,8 @@ export const invoiceService = {
           {"field": {"Name": "subtotal_c"}},
           {"field": {"Name": "tax_c"}},
           {"field": {"Name": "total_c"}},
-          {"field": {"Name": "notes_c"}},
+{"field": {"Name": "notes_c"}},
+          {"field": {"Name": "remarks_c"}},
           {"field": {"Name": "Tags"}}
         ]
       }
@@ -102,7 +104,8 @@ export const invoiceService = {
           subtotal_c: parseFloat(invoiceData.subtotal_c) || 0,
           tax_c: parseFloat(invoiceData.tax_c) || 0,
           total_c: parseFloat(invoiceData.total_c) || 0,
-          notes_c: invoiceData.notes_c || "",
+notes_c: invoiceData.notes_c || "",
+          remarks_c: invoiceData.remarks_c || "",
           Tags: invoiceData.Tags || ""
         }]
       }
@@ -163,7 +166,8 @@ export const invoiceService = {
           subtotal_c: parseFloat(invoiceData.subtotal_c) || 0,
           tax_c: parseFloat(invoiceData.tax_c) || 0,
           total_c: parseFloat(invoiceData.total_c) || 0,
-          notes_c: invoiceData.notes_c || "",
+notes_c: invoiceData.notes_c || "",
+          remarks_c: invoiceData.remarks_c || "",
           Tags: invoiceData.Tags || ""
         }]
       }

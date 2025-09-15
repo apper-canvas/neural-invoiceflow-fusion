@@ -33,7 +33,8 @@ const [formData, setFormData] = useState({
     subtotal_c: 0,
     tax_c: 10,
     total_c: 0,
-    notes_c: ""
+notes_c: "",
+    remarks_c: ""
   })
 
   const loadData = async () => {
@@ -51,8 +52,9 @@ if (isEditing && id) {
             ...invoice,
             client_id_c: invoice.client_id_c?.Id || invoice.client_id_c,
             items_c: typeof invoice.items_c === 'string' ? JSON.parse(invoice.items_c) : invoice.items_c || [],
-            issue_date_c: format(new Date(invoice.issue_date_c), "yyyy-MM-dd"),
-            due_date_c: format(new Date(invoice.due_date_c), "yyyy-MM-dd")
+issue_date_c: format(new Date(invoice.issue_date_c), "yyyy-MM-dd"),
+            due_date_c: format(new Date(invoice.due_date_c), "yyyy-MM-dd"),
+            remarks_c: invoice.remarks_c || ""
           })
         }
       } else if (isDuplicating && duplicateId) {
@@ -65,7 +67,8 @@ if (isEditing && id) {
             items_c: typeof invoice.items_c === 'string' ? JSON.parse(invoice.items_c) : invoice.items_c || [],
             issue_date_c: format(new Date(), "yyyy-MM-dd"),
             due_date_c: format(new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), "yyyy-MM-dd"),
-            status_c: "draft"
+status_c: "draft",
+            remarks_c: invoice.remarks_c || ""
           })
         }
       }
@@ -150,7 +153,8 @@ client_id_c: parseInt(formData.client_id_c),
         subtotal_c: subtotal,
         tax_c: taxAmount,
         total_c: total,
-        notes_c: formData.notes_c
+notes_c: formData.notes_c,
+        remarks_c: formData.remarks_c
       }
 
       if (isEditing) {
@@ -348,7 +352,18 @@ value={formData.tax_c}
           </div>
         </Card>
 
-        {/* Notes */}
+{/* Notes */}
+        <Card className="p-6">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">Notes</h2>
+          <textarea
+            value={formData.notes_c}
+            onChange={(e) => setFormData({ ...formData, notes_c: e.target.value })}
+            placeholder="Additional notes or payment terms..."
+            className="w-full h-24 px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary resize-none"
+          />
+        </Card>
+
+        {/* Remarks */}
         <Card className="p-6">
           <h2 className="text-xl font-semibold text-gray-900 mb-4">Notes</h2>
           <textarea
