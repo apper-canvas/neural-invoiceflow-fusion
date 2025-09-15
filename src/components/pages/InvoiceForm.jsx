@@ -1,0 +1,372 @@
+import React, { useState, useEffect } from "react"
+import { useNavigate, useParams, useSearchParams } from "react-router-dom"
+import { toast } from "react-toastify"
+import Button from "@/components/atoms/Button"
+import Input from "@/components/atoms/Input"
+import Select from "@/components/atoms/Select"
+import Card from "@/components/atoms/Card"
+import ApperIcon from "@/components/ApperIcon"
+import Loading from "@/components/ui/Loading"
+import Error from "@/components/ui/Error"
+import { invoiceService } from "@/services/api/invoiceService"
+import { clientService } from "@/services/api/clientService"
+import { format } from "date-fns"
+
+const InvoiceForm = () => {
+  const navigate = useNavigate()
+  const { id } = useParams()
+  const [searchParams] = useSearchParams()
+  const duplicateId = searchParams.get("duplicate")
+  const isEditing = Boolean(id)
+  const isDuplicating = Boolean(duplicateId)
+
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState("")
+  const [clients, setClients] = useState([])
+  const [formData, setFormData] = useState({
+    clientId: "",
+    issueDate: format(new Date(), "yyyy-MM-dd"),
+    dueDate: format(new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), "yyyy-MM-dd"),
+    items: [{ description: "", quantity: 1, rate: 0, amount: 0 }],
+    tax: 10,
+    notes: "",
+    status: "draft"
+  })
+
+  const loadData = async () => {
+    try {
+      setLoading(true)
+      setError("")
+      
+      const clientsData = await clientService.getAll()
+      setClients(clientsData)
+
+      if (isEditing && id) {
+        const invoice = await invoiceService.getById(id)
+        if (invoice) {
+          setFormData({
+            ...invoice,
+            issueDate: format(new Date(invoice.issueDate), "yyyy-MM-dd"),
+            dueDate: format(new Date(invoice.dueDate), "yyyy-MM-dd")
+          })
+        }
+      } else if (isDuplicating && duplicateId) {
+        const invoice = await invoiceService.getById(duplicateId)
+        if (invoice) {
+          setFormData({
+            ...invoice,
+            issueDate: format(new Date(), "yyyy-MM-dd"),
+            dueDate: format(new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), "yyyy-MM-dd"),
+            status: "draft"
+          })
+        }
+      }
+    } catch (err) {
+      setError("Failed to load form data")
+      console.error("Form loading error:", err)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    loadData()
+  }, [id, duplicateId])
+
+  const calculateItemAmount = (quantity, rate) => {
+    return quantity * rate
+  }
+
+  const calculateTotals = () => {
+    const subtotal = formData.items.reduce((sum, item) => sum + item.amount, 0)
+    const taxAmount = (subtotal * formData.tax) / 100
+    const total = subtotal + taxAmount
+    return { subtotal, taxAmount, total }
+  }
+
+  const handleItemChange = (index, field, value) => {
+    const newItems = [...formData.items]
+    newItems[index] = { ...newItems[index], [field]: value }
+    
+    // Recalculate amount if quantity or rate changes
+    if (field === "quantity" || field === "rate") {
+      newItems[index].amount = calculateItemAmount(
+        newItems[index].quantity, 
+        newItems[index].rate
+      )
+    }
+    
+    setFormData({ ...formData, items: newItems })
+  }
+
+  const addItem = () => {
+    setFormData({
+      ...formData,
+      items: [...formData.items, { description: "", quantity: 1, rate: 0, amount: 0 }]
+    })
+  }
+
+  const removeItem = (index) => {
+    if (formData.items.length > 1) {
+      const newItems = formData.items.filter((_, i) => i !== index)
+      setFormData({ ...formData, items: newItems })
+    }
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    
+    // Validation
+    if (!formData.clientId) {
+      toast.error("Please select a client")
+      return
+    }
+
+    if (formData.items.some(item => !item.description)) {
+      toast.error("Please fill in all item descriptions")
+      return
+    }
+
+    try {
+      setLoading(true)
+      const { subtotal, taxAmount, total } = calculateTotals()
+      
+      const invoiceData = {
+        ...formData,
+        clientId: parseInt(formData.clientId),
+        subtotal,
+        tax: taxAmount,
+        total
+      }
+
+      if (isEditing) {
+        await invoiceService.update(id, invoiceData)
+        toast.success("Invoice updated successfully!")
+      } else {
+        await invoiceService.create(invoiceData)
+        toast.success("Invoice created successfully!")
+      }
+      
+      navigate("/invoices")
+    } catch (err) {
+      toast.error("Failed to save invoice")
+      console.error("Save error:", err)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  if (loading && (!formData.clientId || clients.length === 0)) {
+    return <Loading type="form" />
+  }
+
+  if (error) {
+    return <Error message={error} onRetry={loadData} />
+  }
+
+  const { subtotal, taxAmount, total } = calculateTotals()
+
+  return (
+    <div className="p-6 max-w-4xl mx-auto">
+      {/* Header */}
+      <div className="mb-6">
+        <div className="flex items-center gap-4 mb-4">
+          <Button variant="ghost" onClick={() => navigate("/invoices")}>
+            <ApperIcon name="ArrowLeft" className="h-4 w-4 mr-2" />
+            Back to Invoices
+          </Button>
+        </div>
+        <h1 className="text-3xl font-bold text-gray-900">
+          {isEditing ? "Edit Invoice" : isDuplicating ? "Duplicate Invoice" : "Create New Invoice"}
+        </h1>
+      </div>
+
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Basic Information */}
+        <Card className="p-6">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">Invoice Details</h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Select
+              label="Client"
+              value={formData.clientId}
+              onChange={(e) => setFormData({ ...formData, clientId: e.target.value })}
+              required
+            >
+              <option value="">Select a client</option>
+              {clients.map(client => (
+                <option key={client.Id} value={client.Id}>{client.name}</option>
+              ))}
+            </Select>
+
+            <Select
+              label="Status"
+              value={formData.status}
+              onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+            >
+              <option value="draft">Draft</option>
+              <option value="sent">Sent</option>
+              <option value="paid">Paid</option>
+            </Select>
+
+            <Input
+              type="date"
+              label="Issue Date"
+              value={formData.issueDate}
+              onChange={(e) => setFormData({ ...formData, issueDate: e.target.value })}
+              required
+            />
+
+            <Input
+              type="date"
+              label="Due Date"
+              value={formData.dueDate}
+              onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
+              required
+            />
+          </div>
+        </Card>
+
+        {/* Line Items */}
+        <Card className="p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-semibold text-gray-900">Line Items</h2>
+            <Button type="button" variant="outline" onClick={addItem}>
+              <ApperIcon name="Plus" className="h-4 w-4 mr-2" />
+              Add Item
+            </Button>
+          </div>
+
+          <div className="space-y-4">
+            {formData.items.map((item, index) => (
+              <div key={index} className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end p-4 bg-gray-50 rounded-lg">
+                <div className="md:col-span-5">
+                  <Input
+                    label="Description"
+                    value={item.description}
+                    onChange={(e) => handleItemChange(index, "description", e.target.value)}
+                    placeholder="Describe the service or product"
+                    required
+                  />
+                </div>
+                
+                <div className="md:col-span-2">
+                  <Input
+                    type="number"
+                    label="Quantity"
+                    value={item.quantity}
+                    onChange={(e) => handleItemChange(index, "quantity", parseInt(e.target.value) || 0)}
+                    min="1"
+                    required
+                  />
+                </div>
+                
+                <div className="md:col-span-2">
+                  <Input
+                    type="number"
+                    label="Rate"
+                    value={item.rate}
+                    onChange={(e) => handleItemChange(index, "rate", parseFloat(e.target.value) || 0)}
+                    min="0"
+                    step="0.01"
+                    required
+                  />
+                </div>
+                
+                <div className="md:col-span-2">
+                  <Input
+                    type="number"
+                    label="Amount"
+                    value={item.amount}
+                    readOnly
+                    className="bg-gray-100"
+                  />
+                </div>
+                
+                <div className="md:col-span-1">
+                  {formData.items.length > 1 && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => removeItem(index)}
+                      className="text-error hover:text-error hover:bg-error/10"
+                    >
+                      <ApperIcon name="Trash2" className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Totals */}
+          <div className="mt-6 pt-6 border-t border-gray-200">
+            <div className="flex justify-end">
+              <div className="w-full max-w-xs space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600">Subtotal:</span>
+                  <span className="font-medium">${subtotal.toLocaleString()}</span>
+                </div>
+                
+                <div className="flex justify-between items-center text-sm">
+                  <div className="flex items-center">
+                    <span className="text-gray-600 mr-2">Tax:</span>
+                    <Input
+                      type="number"
+                      value={formData.tax}
+                      onChange={(e) => setFormData({ ...formData, tax: parseFloat(e.target.value) || 0 })}
+                      className="w-16 h-6 text-xs px-2"
+                      min="0"
+                      step="0.1"
+                    />
+                    <span className="text-gray-600 ml-1">%</span>
+                  </div>
+                  <span className="font-medium">${taxAmount.toLocaleString()}</span>
+                </div>
+                
+                <div className="flex justify-between text-lg font-bold pt-2 border-t border-gray-200">
+                  <span>Total:</span>
+                  <span className="text-primary">${total.toLocaleString()}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </Card>
+
+        {/* Notes */}
+        <Card className="p-6">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">Notes</h2>
+          <textarea
+            value={formData.notes}
+            onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+            placeholder="Additional notes or payment terms..."
+            className="w-full h-24 px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary resize-none"
+          />
+        </Card>
+
+        {/* Actions */}
+        <div className="flex justify-end gap-4">
+          <Button type="button" variant="secondary" onClick={() => navigate("/invoices")}>
+            Cancel
+          </Button>
+          <Button type="submit" disabled={loading}>
+            {loading ? (
+              <>
+                <ApperIcon name="Loader2" className="h-4 w-4 mr-2 animate-spin" />
+                Saving...
+              </>
+            ) : (
+              <>
+                <ApperIcon name="Save" className="h-4 w-4 mr-2" />
+                {isEditing ? "Update Invoice" : "Create Invoice"}
+              </>
+            )}
+          </Button>
+        </div>
+      </form>
+    </div>
+  )
+}
+
+export default InvoiceForm

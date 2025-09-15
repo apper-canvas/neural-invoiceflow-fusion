@@ -1,0 +1,30 @@
+[
+  {
+    "Id": 1,
+    "name": "Acme Corporation",
+    "email": "billing@acme.com",
+    "address": "123 Business Ave, Suite 100, New York, NY 10001",
+    "phone": "+1 (555) 123-4567"
+  },
+  {
+    "Id": 2,
+    "name": "Tech Startup Inc",
+    "email": "accounts@techstartup.com",
+    "address": "456 Innovation Blvd, San Francisco, CA 94102",
+    "phone": "+1 (555) 987-6543"
+  },
+  {
+    "Id": 3,
+    "name": "Creative Agency LLC",
+    "email": "finance@creativeagency.com",
+    "address": "789 Design District, Austin, TX 73301",
+    "phone": "+1 (555) 456-7890"
+  },
+  {
+    "Id": 4,
+    "name": "E-commerce Solutions",
+    "email": "payments@ecommsolutions.com",
+    "address": "321 Commerce St, Seattle, WA 98101",
+    "phone": "+1 (555) 234-5678"
+  }
+]
