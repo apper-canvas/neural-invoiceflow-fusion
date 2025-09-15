@@ -23,9 +23,8 @@ const InvoiceForm = () => {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const [clients, setClients] = useState([])
-  const [formData, setFormData] = useState({
-    clientId: "",
-client_id_c: "",
+const [formData, setFormData] = useState({
+    client_id_c: "",
     number_c: "",
     status_c: "draft",
     issue_date_c: format(new Date(), "yyyy-MM-dd"),
@@ -86,15 +85,15 @@ if (isEditing && id) {
     return quantity * rate
   }
 
-  const calculateTotals = () => {
-    const subtotal = formData.items.reduce((sum, item) => sum + item.amount, 0)
-    const taxAmount = (subtotal * formData.tax) / 100
+const calculateTotals = () => {
+    const subtotal = formData.items_c.reduce((sum, item) => sum + item.amount, 0)
+    const taxAmount = (subtotal * formData.tax_c) / 100
     const total = subtotal + taxAmount
     return { subtotal, taxAmount, total }
   }
 
   const handleItemChange = (index, field, value) => {
-    const newItems = [...formData.items]
+const newItems = [...formData.items_c]
     newItems[index] = { ...newItems[index], [field]: value }
     
     // Recalculate amount if quantity or rate changes
@@ -105,20 +104,20 @@ if (isEditing && id) {
       )
     }
     
-    setFormData({ ...formData, items: newItems })
+    setFormData({ ...formData, items_c: newItems })
   }
 
   const addItem = () => {
     setFormData({
-      ...formData,
-      items: [...formData.items, { description: "", quantity: 1, rate: 0, amount: 0 }]
+...formData,
+      items_c: [...formData.items_c, { description: "", quantity: 1, rate: 0, amount: 0 }]
     })
   }
 
   const removeItem = (index) => {
-    if (formData.items.length > 1) {
-      const newItems = formData.items.filter((_, i) => i !== index)
-      setFormData({ ...formData, items: newItems })
+if (formData.items_c.length > 1) {
+      const newItems = formData.items_c.filter((_, i) => i !== index)
+      setFormData({ ...formData, items_c: newItems })
     }
   }
 
@@ -126,12 +125,12 @@ if (isEditing && id) {
     e.preventDefault()
     
     // Validation
-    if (!formData.clientId) {
+if (!formData.client_id_c) {
       toast.error("Please select a client")
       return
     }
 
-    if (formData.items.some(item => !item.description)) {
+if (formData.items_c.some(item => !item.description)) {
       toast.error("Please fill in all item descriptions")
       return
     }
@@ -171,7 +170,7 @@ client_id_c: parseInt(formData.client_id_c),
     }
   }
 
-  if (loading && (!formData.clientId || clients.length === 0)) {
+if (loading && (!formData.client_id_c || clients.length === 0)) {
     return <Loading type="form" />
   }
 
@@ -204,8 +203,8 @@ client_id_c: parseInt(formData.client_id_c),
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Select
               label="Client"
-              value={formData.clientId}
-              onChange={(e) => setFormData({ ...formData, clientId: e.target.value })}
+value={formData.client_id_c}
+              onChange={(e) => setFormData({ ...formData, client_id_c: e.target.value })}
               required
             >
               <option value="">Select a client</option>
@@ -227,16 +226,16 @@ client_id_c: parseInt(formData.client_id_c),
             <Input
               type="date"
               label="Issue Date"
-              value={formData.issueDate}
-              onChange={(e) => setFormData({ ...formData, issueDate: e.target.value })}
+value={formData.issue_date_c}
+              onChange={(e) => setFormData({ ...formData, issue_date_c: e.target.value })}
               required
             />
 
             <Input
               type="date"
               label="Due Date"
-              value={formData.dueDate}
-              onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
+value={formData.due_date_c}
+              onChange={(e) => setFormData({ ...formData, due_date_c: e.target.value })}
               required
             />
           </div>
@@ -253,7 +252,7 @@ client_id_c: parseInt(formData.client_id_c),
           </div>
 
           <div className="space-y-4">
-            {formData.items.map((item, index) => (
+{formData.items_c.map((item, index) => (
               <div key={index} className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end p-4 bg-gray-50 rounded-lg">
                 <div className="md:col-span-5">
                   <Input
@@ -299,7 +298,7 @@ client_id_c: parseInt(formData.client_id_c),
                 </div>
                 
                 <div className="md:col-span-1">
-                  {formData.items.length > 1 && (
+{formData.items_c.length > 1 && (
                     <Button
                       type="button"
                       variant="ghost"
