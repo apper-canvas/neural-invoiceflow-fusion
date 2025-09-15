@@ -64,10 +64,12 @@ const Clients = () => {
 
     try {
       if (editingClient) {
-        const updated = await clientService.update(editingClient.Id, formData)
-        setClients(prev => prev.map(client => 
-          client.Id === editingClient.Id ? updated : client
-        ))
+const updated = await clientService.update(editingClient.Id, formData)
+        if (updated) {
+          setClients(prev => prev.map(client => 
+            client.Id === editingClient.Id ? updated : client
+          ))
+        }
         toast.success("Client updated successfully!")
       } else {
         const newClient = await clientService.create(formData)
@@ -85,8 +87,10 @@ const Clients = () => {
   const handleDelete = async (clientId) => {
     if (window.confirm("Are you sure you want to delete this client?")) {
       try {
-        await clientService.delete(clientId)
-        setClients(prev => prev.filter(client => client.Id !== clientId))
+const success = await clientService.delete(clientId)
+        if (success) {
+          setClients(prev => prev.filter(client => client.Id !== clientId))
+        }
         toast.success("Client deleted successfully")
       } catch (err) {
         toast.error("Failed to delete client")
@@ -95,9 +99,9 @@ const Clients = () => {
     }
   }
 
-  const filteredClients = clients.filter(client =>
-    client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    client.email.toLowerCase().includes(searchTerm.toLowerCase())
+const filteredClients = clients.filter(client =>
+    (client.name_c || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (client.email_c || "").toLowerCase().includes(searchTerm.toLowerCase())
   )
 
   if (loading) return <Loading />
@@ -227,28 +231,28 @@ const Clients = () => {
               <div className="space-y-3">
                 <div>
                   <h3 className="font-semibold text-gray-900 text-lg mb-1">
-                    {client.name}
+{client.name_c}
                   </h3>
                 </div>
 
-                {client.email && (
+{client.email_c && (
                   <div className="flex items-center text-sm text-gray-600">
                     <ApperIcon name="Mail" className="h-4 w-4 mr-2 flex-shrink-0" />
-                    <span className="truncate">{client.email}</span>
+                    <span className="truncate">{client.email_c}</span>
                   </div>
                 )}
 
-                {client.phone && (
+{client.phone_c && (
                   <div className="flex items-center text-sm text-gray-600">
                     <ApperIcon name="Phone" className="h-4 w-4 mr-2 flex-shrink-0" />
-                    <span>{client.phone}</span>
+                    <span>{client.phone_c}</span>
                   </div>
                 )}
 
-                {client.address && (
+{client.address_c && (
                   <div className="flex items-start text-sm text-gray-600">
                     <ApperIcon name="MapPin" className="h-4 w-4 mr-2 flex-shrink-0 mt-0.5" />
-                    <span className="line-clamp-2">{client.address}</span>
+                    <span className="line-clamp-2">{client.address_c}</span>
                   </div>
                 )}
               </div>

@@ -1,10 +1,15 @@
-import React from "react"
+import React, { useContext } from "react"
 import { NavLink, useLocation } from "react-router-dom"
+import { useSelector } from "react-redux"
 import { cn } from "@/utils/cn"
+import { AuthContext } from "@/App"
+import Button from "@/components/atoms/Button"
 import ApperIcon from "@/components/ApperIcon"
 
 const Sidebar = ({ className }) => {
   const location = useLocation()
+  const { logout } = useContext(AuthContext)
+  const { user } = useSelector((state) => state.user)
 
   const navigation = [
     {
@@ -63,11 +68,22 @@ const Sidebar = ({ className }) => {
           ))}
         </nav>
 
-        {/* Footer */}
-        <div className="px-6 py-4 border-t border-gray-200">
-          <div className="text-xs text-gray-500 text-center">
-            Simple invoice management
-          </div>
+        {/* Footer with User & Logout */}
+        <div className="px-4 py-4 border-t border-gray-200 space-y-3">
+          {user && (
+            <div className="text-xs text-gray-600 text-center">
+              {user.firstName} {user.lastName}
+            </div>
+          )}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={logout}
+            className="w-full justify-center text-gray-600 hover:text-gray-900"
+          >
+            <ApperIcon name="LogOut" className="h-4 w-4 mr-2" />
+            Logout
+          </Button>
         </div>
       </div>
     </div>

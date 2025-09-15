@@ -49,8 +49,8 @@ const Invoices = () => {
   const handleStatusChange = async (invoiceId, newStatus) => {
     try {
       await invoiceService.updateStatus(invoiceId, newStatus)
-      setInvoices(prev => prev.map(invoice =>
-        invoice.Id === invoiceId ? { ...invoice, status: newStatus } : invoice
+setInvoices(prev => prev.map(invoice =>
+        invoice.Id === invoiceId ? { ...invoice, status_c: newStatus } : invoice
       ))
     } catch (err) {
       console.error("Status update error:", err)
@@ -58,9 +58,11 @@ const Invoices = () => {
   }
 
   const handleDelete = async (invoiceId) => {
-    try {
-      await invoiceService.delete(invoiceId)
-      setInvoices(prev => prev.filter(invoice => invoice.Id !== invoiceId))
+try {
+      const success = await invoiceService.delete(invoiceId)
+      if (success) {
+        setInvoices(prev => prev.filter(invoice => invoice.Id !== invoiceId))
+      }
     } catch (err) {
       console.error("Delete error:", err)
     }
@@ -68,14 +70,14 @@ const Invoices = () => {
 
   // Filter invoices
   const filteredInvoices = invoices.filter(invoice => {
-    const client = clients.find(c => c.Id === invoice.clientId)
-    const clientName = client?.name || ""
+const client = clients.find(c => c.Id === (invoice.client_id_c?.Id || invoice.client_id_c))
+    const clientName = client?.name_c || ""
     
     const matchesSearch = 
-      invoice.number.toLowerCase().includes(searchTerm.toLowerCase()) ||
+(invoice.number_c || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
       clientName.toLowerCase().includes(searchTerm.toLowerCase())
     
-    const matchesStatus = statusFilter === "all" || invoice.status === statusFilter
+const matchesStatus = statusFilter === "all" || invoice.status_c === statusFilter
     
     return matchesSearch && matchesStatus
   })
@@ -135,7 +137,7 @@ const Invoices = () => {
       ) : (
         <div className="space-y-4">
           {filteredInvoices.map((invoice) => {
-            const client = clients.find(c => c.Id === invoice.clientId)
+const client = clients.find(c => c.Id === (invoice.client_id_c?.Id || invoice.client_id_c))
             return (
               <Card key={invoice.Id} className="p-6 hover:shadow-lg transition-all duration-200">
                 <div className="flex items-center justify-between">
@@ -144,33 +146,32 @@ const Invoices = () => {
                       <ApperIcon name="Receipt" className="h-6 w-6 text-primary" />
                     </div>
                     
-                    <div>
-                      <h3 className="font-semibold text-gray-900 mb-1">{invoice.number}</h3>
+<div>
+                      <h3 className="font-semibold text-gray-900 mb-1">{invoice.number_c}</h3>
                       <p className="text-sm text-gray-600">{client?.name || "Unknown Client"}</p>
                     </div>
                     
                     <div className="hidden sm:block">
                       <p className="text-sm text-gray-500 mb-1">Issue Date</p>
-                      <p className="font-medium text-gray-900">
-                        {format(new Date(invoice.issueDate), "MMM dd, yyyy")}
+<p className="font-medium text-gray-900">
+                        {format(new Date(invoice.issue_date_c), "MMM dd, yyyy")}
                       </p>
                     </div>
                     
                     <div className="hidden sm:block">
-                      <p className="text-sm text-gray-500 mb-1">Due Date</p>
+<p className="text-sm text-gray-500 mb-1">Due Date</p>
                       <p className="font-medium text-gray-900">
-                        {format(new Date(invoice.dueDate), "MMM dd, yyyy")}
+                        {format(new Date(invoice.due_date_c), "MMM dd, yyyy")}
                       </p>
                     </div>
-                    
-                    <StatusBadge status={invoice.status} dueDate={invoice.dueDate} />
+<StatusBadge status={invoice.status_c} dueDate={invoice.due_date_c} />
                   </div>
                   
                   <div className="flex items-center space-x-6">
                     <div className="text-right">
                       <p className="text-sm text-gray-500 mb-1">Amount</p>
                       <p className="font-semibold text-xl text-gray-900">
-                        ${invoice.total.toLocaleString()}
+${(invoice.total_c || 0).toLocaleString()}
                       </p>
                     </div>
                     

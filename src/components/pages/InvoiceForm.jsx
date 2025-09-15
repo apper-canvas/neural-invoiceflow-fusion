@@ -25,12 +25,16 @@ const InvoiceForm = () => {
   const [clients, setClients] = useState([])
   const [formData, setFormData] = useState({
     clientId: "",
-    issueDate: format(new Date(), "yyyy-MM-dd"),
-    dueDate: format(new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), "yyyy-MM-dd"),
-    items: [{ description: "", quantity: 1, rate: 0, amount: 0 }],
-    tax: 10,
-    notes: "",
-    status: "draft"
+client_id_c: "",
+    number_c: "",
+    status_c: "draft",
+    issue_date_c: format(new Date(), "yyyy-MM-dd"),
+    due_date_c: format(new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), "yyyy-MM-dd"),
+    items_c: [{ description: "", quantity: 1, rate: 0, amount: 0 }],
+    subtotal_c: 0,
+    tax_c: 10,
+    total_c: 0,
+    notes_c: ""
   })
 
   const loadData = async () => {
@@ -41,13 +45,15 @@ const InvoiceForm = () => {
       const clientsData = await clientService.getAll()
       setClients(clientsData)
 
-      if (isEditing && id) {
+if (isEditing && id) {
         const invoice = await invoiceService.getById(id)
         if (invoice) {
           setFormData({
             ...invoice,
-            issueDate: format(new Date(invoice.issueDate), "yyyy-MM-dd"),
-            dueDate: format(new Date(invoice.dueDate), "yyyy-MM-dd")
+            client_id_c: invoice.client_id_c?.Id || invoice.client_id_c,
+            items_c: typeof invoice.items_c === 'string' ? JSON.parse(invoice.items_c) : invoice.items_c || [],
+            issue_date_c: format(new Date(invoice.issue_date_c), "yyyy-MM-dd"),
+            due_date_c: format(new Date(invoice.due_date_c), "yyyy-MM-dd")
           })
         }
       } else if (isDuplicating && duplicateId) {
@@ -55,9 +61,12 @@ const InvoiceForm = () => {
         if (invoice) {
           setFormData({
             ...invoice,
-            issueDate: format(new Date(), "yyyy-MM-dd"),
-            dueDate: format(new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), "yyyy-MM-dd"),
-            status: "draft"
+            client_id_c: invoice.client_id_c?.Id || invoice.client_id_c,
+            number_c: "",
+            items_c: typeof invoice.items_c === 'string' ? JSON.parse(invoice.items_c) : invoice.items_c || [],
+            issue_date_c: format(new Date(), "yyyy-MM-dd"),
+            due_date_c: format(new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), "yyyy-MM-dd"),
+            status_c: "draft"
           })
         }
       }
@@ -133,10 +142,16 @@ const InvoiceForm = () => {
       
       const invoiceData = {
         ...formData,
-        clientId: parseInt(formData.clientId),
-        subtotal,
-        tax: taxAmount,
-        total
+client_id_c: parseInt(formData.client_id_c),
+        number_c: formData.number_c,
+        status_c: formData.status_c,
+        issue_date_c: formData.issue_date_c,
+        due_date_c: formData.due_date_c,
+        items_c: formData.items_c,
+        subtotal_c: subtotal,
+        tax_c: taxAmount,
+        total_c: total,
+        notes_c: formData.notes_c
       }
 
       if (isEditing) {
@@ -194,15 +209,15 @@ const InvoiceForm = () => {
               required
             >
               <option value="">Select a client</option>
-              {clients.map(client => (
-                <option key={client.Id} value={client.Id}>{client.name}</option>
+{clients.map(client => (
+                <option key={client.Id} value={client.Id}>{client.name_c}</option>
               ))}
             </Select>
 
-            <Select
+<Select
               label="Status"
-              value={formData.status}
-              onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+              value={formData.status_c}
+              onChange={(e) => setFormData({ ...formData, status_c: e.target.value })}
             >
               <option value="draft">Draft</option>
               <option value="sent">Sent</option>
@@ -314,8 +329,8 @@ const InvoiceForm = () => {
                     <span className="text-gray-600 mr-2">Tax:</span>
                     <Input
                       type="number"
-                      value={formData.tax}
-                      onChange={(e) => setFormData({ ...formData, tax: parseFloat(e.target.value) || 0 })}
+value={formData.tax_c}
+                      onChange={(e) => setFormData({ ...formData, tax_c: parseFloat(e.target.value) || 0 })}
                       className="w-16 h-6 text-xs px-2"
                       min="0"
                       step="0.1"
@@ -338,8 +353,8 @@ const InvoiceForm = () => {
         <Card className="p-6">
           <h2 className="text-xl font-semibold text-gray-900 mb-4">Notes</h2>
           <textarea
-            value={formData.notes}
-            onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+value={formData.notes_c}
+            onChange={(e) => setFormData({ ...formData, notes_c: e.target.value })}
             placeholder="Additional notes or payment terms..."
             className="w-full h-24 px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary resize-none"
           />

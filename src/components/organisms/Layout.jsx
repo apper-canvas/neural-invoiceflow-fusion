@@ -1,13 +1,16 @@
-import React, { useState } from "react"
-import { Outlet, useLocation } from "react-router-dom"
-import Button from "@/components/atoms/Button"
-import ApperIcon from "@/components/ApperIcon"
-import Sidebar from "@/components/organisms/Sidebar"
-import MobileSidebar from "@/components/organisms/MobileSidebar"
+import React, { useContext, useState } from "react";
+import { Outlet, useLocation } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { AuthContext } from "@/App";
+import ApperIcon from "@/components/ApperIcon";
+import Sidebar from "@/components/organisms/Sidebar";
+import MobileSidebar from "@/components/organisms/MobileSidebar";
+import Button from "@/components/atoms/Button";
 
 const Layout = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const location = useLocation()
+  const authMethods = useContext(AuthContext)
 
   const navigation = [
     {
@@ -48,7 +51,7 @@ const Layout = () => {
         {/* Main Content */}
         <div className="flex-1 flex flex-col overflow-hidden">
           {/* Mobile Header */}
-          <div className="lg:hidden bg-white border-b border-gray-200 px-4 py-3">
+<div className="lg:hidden bg-white border-b border-gray-200 px-4 py-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center">
                 <Button
@@ -68,6 +71,14 @@ const Layout = () => {
                   </span>
                 </div>
               </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => authMethods?.logout()}
+                className="text-gray-600 hover:text-gray-900"
+              >
+                <ApperIcon name="LogOut" className="h-4 w-4" />
+              </Button>
             </div>
           </div>
 

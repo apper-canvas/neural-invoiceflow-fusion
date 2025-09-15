@@ -28,9 +28,9 @@ const Dashboard = () => {
       setStats(statsData)
       
       // Get recent invoices with client data
-      const recentWithClients = invoicesData.slice(0, 5).map(invoice => {
-        const client = clientsData.find(c => c.Id === invoice.clientId)
-        return { ...invoice, clientName: client?.name || "Unknown Client" }
+const recentWithClients = invoicesData.slice(0, 5).map(invoice => {
+        const client = clientsData.find(c => c.Id === (invoice.client_id_c?.Id || invoice.client_id_c))
+        return { ...invoice, clientName: client?.name_c || "Unknown Client" }
       })
       
       setRecentInvoices(recentWithClients)
@@ -117,18 +117,18 @@ const Dashboard = () => {
                   <ApperIcon name="Receipt" className="h-5 w-5 text-primary" />
                 </div>
                 <div>
-                  <p className="font-medium text-gray-900">{invoice.number}</p>
+<p className="font-medium text-gray-900">{invoice.number_c}</p>
                   <p className="text-sm text-gray-600">{invoice.clientName}</p>
                 </div>
               </div>
               
               <div className="flex items-center space-x-4">
                 <div className="text-right">
-                  <p className="font-medium text-gray-900">${invoice.total.toLocaleString()}</p>
-                  <p className="text-sm text-gray-600">{format(new Date(invoice.issueDate), 'MMM dd')}</p>
+<p className="font-medium text-gray-900">${(invoice.total_c || 0).toLocaleString()}</p>
+                  <p className="text-sm text-gray-600">{format(new Date(invoice.issue_date_c), 'MMM dd')}</p>
                 </div>
                 <Badge variant={invoice.status}>
-                  {invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1)}
+{(invoice.status_c || "").charAt(0).toUpperCase() + (invoice.status_c || "").slice(1)}
                 </Badge>
               </div>
             </div>
