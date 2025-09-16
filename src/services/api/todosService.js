@@ -329,5 +329,3 @@ export default new class {
   async delete(id) { return todosService.delete(id) }
   async getByInvoiceId(invoiceId) { return todosService.getByInvoiceId(invoiceId) }
 }()
-
-export const todosService = new TodosService();
