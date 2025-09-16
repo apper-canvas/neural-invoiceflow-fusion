@@ -12,7 +12,7 @@ const Layout = () => {
   const location = useLocation()
   const authMethods = useContext(AuthContext)
 
-  const navigation = [
+const navigation = [
     {
       name: "Dashboard",
       href: "/",
@@ -30,6 +30,12 @@ const Layout = () => {
       href: "/clients", 
       icon: "Users",
       current: location.pathname === "/clients"
+    },
+    {
+      name: "Todos",
+      href: "/todos",
+      icon: "CheckSquare",
+      current: location.pathname === "/todos"
     }
   ]
 
