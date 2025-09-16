@@ -363,16 +363,30 @@ value={formData.tax_c}
           />
         </Card>
 
-        {/* Remarks */}
-        <Card className="p-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Notes</h2>
-          <textarea
+{/* Notes and Remarks */}
+<Card className="p-6">
+<h2 className="text-xl font-semibold text-gray-900 mb-4">Notes & Remarks</h2>
+<div className="space-y-4">
+<div>
+<label className="block text-sm font-medium text-gray-700 mb-2">Notes</label>
+<textarea
 value={formData.notes_c}
-            onChange={(e) => setFormData({ ...formData, notes_c: e.target.value })}
-            placeholder="Additional notes or payment terms..."
-            className="w-full h-24 px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary resize-none"
-          />
-        </Card>
+onChange={(e) => setFormData({ ...formData, notes_c: e.target.value })}
+placeholder="Additional notes or payment terms..."
+className="w-full h-24 px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary resize-none"
+/>
+</div>
+<div>
+<label className="block text-sm font-medium text-gray-700 mb-2">Remarks</label>
+<textarea
+value={formData.remarks_c}
+onChange={(e) => setFormData({ ...formData, remarks_c: e.target.value })}
+placeholder="Internal remarks or additional comments..."
+className="w-full h-24 px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary resize-none"
+/>
+</div>
+</div>
+</Card>
 
         {/* Actions */}
         <div className="flex justify-end gap-4">

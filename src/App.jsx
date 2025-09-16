@@ -8,6 +8,7 @@ import Dashboard from "@/components/pages/Dashboard"
 import Invoices from "@/components/pages/Invoices"
 import InvoiceForm from "@/components/pages/InvoiceForm"
 import Clients from "@/components/pages/Clients"
+import Todos from "@/components/pages/Todos"
 import Login from '@/components/pages/Login'
 import Signup from '@/components/pages/Signup'
 import Callback from '@/components/pages/Callback'
@@ -128,13 +129,14 @@ function AppContent() {
         <Route path="/error" element={<ErrorPage />} />
         <Route path="/prompt-password/:appId/:emailAddress/:provider" element={<PromptPassword />} />
         <Route path="/reset-password/:appId/:fields" element={<ResetPassword />} />
-        <Route path="/" element={<Layout />}>
-          <Route index element={<Dashboard />} />
-          <Route path="invoices" element={<Invoices />} />
-          <Route path="invoices/new" element={<InvoiceForm />} />
-          <Route path="invoices/edit/:id" element={<InvoiceForm />} />
-          <Route path="clients" element={<Clients />} />
-        </Route>
+<Route path="/" element={<Layout />}>
+<Route index element={<Dashboard />} />
+<Route path="invoices" element={<Invoices />} />
+<Route path="invoices/new" element={<InvoiceForm />} />
+<Route path="invoices/edit/:id" element={<InvoiceForm />} />
+<Route path="clients" element={<Clients />} />
+<Route path="todos" element={<Todos />} />
+</Route>
         <Route path="*" element={<NotFound />} />
       </Routes>
       <ToastContainer

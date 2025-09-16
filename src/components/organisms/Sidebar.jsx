@@ -24,13 +24,19 @@ const Sidebar = ({ className }) => {
       icon: "FileText",
       current: location.pathname.startsWith("/invoices")
     },
-    {
-      name: "Clients",
-      href: "/clients",
-      icon: "Users",
-      current: location.pathname === "/clients"
-    }
-  ]
+{
+name: "Clients",
+href: "/clients",
+icon: "Users",
+current: location.pathname === "/clients"
+},
+{
+name: "Todos",
+href: "/todos",
+icon: "CheckSquare",
+current: location.pathname === "/todos"
+}
+]
 
   return (
     <div className={cn("bg-white border-r border-gray-200", className)}>
