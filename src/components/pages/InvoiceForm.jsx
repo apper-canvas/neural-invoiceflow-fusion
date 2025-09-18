@@ -352,38 +352,29 @@ value={formData.tax_c}
           </div>
         </Card>
 
-{/* Notes */}
-        <Card className="p-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Notes</h2>
-          <textarea
-            value={formData.notes_c}
-            onChange={(e) => setFormData({ ...formData, notes_c: e.target.value })}
-            placeholder="Additional notes or payment terms..."
-            className="w-full h-24 px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary resize-none"
-          />
-        </Card>
-
-{/* Notes and Remarks */}
+{/* Invoice Description & Notes */}
 <Card className="p-6">
-<h2 className="text-xl font-semibold text-gray-900 mb-4">Notes & Remarks</h2>
+<h2 className="text-xl font-semibold text-gray-900 mb-4">Invoice Description & Notes</h2>
 <div className="space-y-4">
 <div>
-<label className="block text-sm font-medium text-gray-700 mb-2">Notes</label>
+<label className="block text-sm font-medium text-gray-700 mb-2">Invoice Description</label>
 <textarea
 value={formData.notes_c}
 onChange={(e) => setFormData({ ...formData, notes_c: e.target.value })}
-placeholder="Additional notes or payment terms..."
+placeholder="Describe discounts provided, special terms, payment conditions, or any other important invoice details..."
 className="w-full h-24 px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary resize-none"
 />
+<p className="text-xs text-gray-500 mt-1">Add details about discounts, promotions, payment terms, or special conditions for this invoice.</p>
 </div>
 <div>
-<label className="block text-sm font-medium text-gray-700 mb-2">Remarks</label>
+<label className="block text-sm font-medium text-gray-700 mb-2">Internal Remarks</label>
 <textarea
 value={formData.remarks_c}
 onChange={(e) => setFormData({ ...formData, remarks_c: e.target.value })}
-placeholder="Internal remarks or additional comments..."
+placeholder="Internal notes for team reference..."
 className="w-full h-24 px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary resize-none"
 />
+<p className="text-xs text-gray-500 mt-1">Private notes for internal use only, not visible to clients.</p>
 </div>
 </div>
 </Card>
