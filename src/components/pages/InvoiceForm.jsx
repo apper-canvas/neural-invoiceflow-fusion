@@ -22,8 +22,11 @@ const InvoiceForm = () => {
 
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
-  const [clients, setClients] = useState([])
-const [formData, setFormData] = useState({
+const [clients, setClients] = useState([])
+  const [logoUrl, setLogoUrl] = useState("")
+  const [logoLoading, setLogoLoading] = useState(false)
+  const [logoError, setLogoError] = useState("")
+  const [formData, setFormData] = useState({
     client_id_c: "",
     number_c: "",
     status_c: "draft",
@@ -34,7 +37,7 @@ const [formData, setFormData] = useState({
     subtotal_c: 0,
     tax_c: 10,
     total_c: 0,
-notes_c: "",
+    notes_c: "",
     remarks_c: ""
   })
 
@@ -83,9 +86,64 @@ status_c: "draft",
     }
   }
 
-  useEffect(() => {
+useEffect(() => {
     loadData()
   }, [id, duplicateId])
+
+  // Fetch client logo when client is selected
+  useEffect(() => {
+    const fetchClientLogo = async () => {
+      if (!formData.client_id_c || !clients.length) {
+        setLogoUrl("")
+        setLogoError("")
+        return
+      }
+
+      const selectedClient = clients.find(client => client.Id === parseInt(formData.client_id_c))
+      if (!selectedClient || !selectedClient.email_c) {
+        setLogoUrl("")
+        setLogoError("")
+        return
+      }
+
+      setLogoLoading(true)
+      setLogoError("")
+      setLogoUrl("")
+
+      try {
+        const { ApperClient } = window.ApperSDK
+        const apperClient = new ApperClient({
+          apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+          apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+        })
+
+        const result = await apperClient.functions.invoke(import.meta.env.VITE_FETCH_CLIENT_LOGO, {
+          method: 'POST',
+          body: JSON.stringify({
+            clientEmail: selectedClient.email_c,
+            clientName: selectedClient.name_c || selectedClient.Name
+          }),
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
+
+        if (result.success && result.logoUrl) {
+          setLogoUrl(result.logoUrl)
+          toast.success('Client logo loaded successfully')
+        } else {
+          setLogoError(result.message || 'Failed to fetch client logo')
+        }
+      } catch (error) {
+        console.error('Error fetching client logo:', error)
+        setLogoError('Failed to fetch client logo')
+      } finally {
+        setLogoLoading(false)
+      }
+    }
+
+    fetchClientLogo()
+  }, [formData.client_id_c, clients])
 
   const calculateItemAmount = (quantity, rate) => {
     return quantity * rate
@@ -210,16 +268,52 @@ if (loading && (!formData.client_id_c || clients.length === 0)) {
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Select
-              label="Client"
-value={formData.client_id_c}
+label="Client"
+              value={formData.client_id_c}
               onChange={(e) => setFormData({ ...formData, client_id_c: e.target.value })}
               required
             >
               <option value="">Select a client</option>
-{clients.map(client => (
+              {clients.map(client => (
                 <option key={client.Id} value={client.Id}>{client.name_c}</option>
               ))}
             </Select>
+            
+            {/* Client Logo Display */}
+            {formData.client_id_c && (
+              <div className="mt-4 p-4 border border-gray-200 rounded-lg bg-gray-50">
+                <h4 className="text-sm font-medium text-gray-700 mb-2">Client Logo</h4>
+                {logoLoading && (
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <ApperIcon name="Loader2" size={16} className="animate-spin" />
+                    Generating client logo...
+                  </div>
+                )}
+                {logoError && !logoLoading && (
+                  <div className="flex items-center gap-2 text-sm text-red-600">
+                    <ApperIcon name="AlertCircle" size={16} />
+                    {logoError}
+                  </div>
+                )}
+                {logoUrl && !logoLoading && (
+                  <div className="flex items-center gap-3">
+                    <img 
+                      src={logoUrl} 
+                      alt="Client Logo" 
+                      className="w-16 h-16 object-contain rounded border bg-white"
+                      onError={() => {
+                        setLogoError('Failed to load logo image')
+                        setLogoUrl('')
+                      }}
+                    />
+                    <div className="text-sm text-green-600 flex items-center gap-1">
+                      <ApperIcon name="CheckCircle" size={16} />
+                      Logo loaded successfully
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
 
 <Select
               label="Status"
