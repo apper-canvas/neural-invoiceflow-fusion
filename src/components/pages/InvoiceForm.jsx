@@ -29,6 +29,7 @@ const [formData, setFormData] = useState({
     status_c: "draft",
     issue_date_c: format(new Date(), "yyyy-MM-dd"),
     due_date_c: format(new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), "yyyy-MM-dd"),
+    expiry_date_c: format(new Date(Date.now() + 60 * 24 * 60 * 60 * 1000), "yyyy-MM-dd"),
     items_c: [{ description: "", quantity: 1, rate: 0, amount: 0 }],
     subtotal_c: 0,
     tax_c: 10,
@@ -54,6 +55,7 @@ if (isEditing && id) {
             items_c: typeof invoice.items_c === 'string' ? JSON.parse(invoice.items_c) : invoice.items_c || [],
 issue_date_c: format(new Date(invoice.issue_date_c), "yyyy-MM-dd"),
             due_date_c: format(new Date(invoice.due_date_c), "yyyy-MM-dd"),
+            expiry_date_c: invoice.expiry_date_c ? format(new Date(invoice.expiry_date_c), "yyyy-MM-dd") : format(new Date(Date.now() + 60 * 24 * 60 * 60 * 1000), "yyyy-MM-dd"),
             remarks_c: invoice.remarks_c || ""
           })
         }
@@ -65,8 +67,9 @@ issue_date_c: format(new Date(invoice.issue_date_c), "yyyy-MM-dd"),
             client_id_c: invoice.client_id_c?.Id || invoice.client_id_c,
             number_c: "",
             items_c: typeof invoice.items_c === 'string' ? JSON.parse(invoice.items_c) : invoice.items_c || [],
-            issue_date_c: format(new Date(), "yyyy-MM-dd"),
+issue_date_c: format(new Date(), "yyyy-MM-dd"),
             due_date_c: format(new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), "yyyy-MM-dd"),
+            expiry_date_c: format(new Date(Date.now() + 60 * 24 * 60 * 60 * 1000), "yyyy-MM-dd"),
 status_c: "draft",
             remarks_c: invoice.remarks_c || ""
           })
@@ -147,8 +150,9 @@ if (formData.items_c.some(item => !item.description)) {
 client_id_c: parseInt(formData.client_id_c),
         number_c: formData.number_c,
         status_c: formData.status_c,
-        issue_date_c: formData.issue_date_c,
+issue_date_c: formData.issue_date_c,
         due_date_c: formData.due_date_c,
+        expiry_date_c: formData.expiry_date_c,
         items_c: formData.items_c,
         subtotal_c: subtotal,
         tax_c: taxAmount,
@@ -237,9 +241,18 @@ value={formData.issue_date_c}
 
             <Input
               type="date"
-              label="Due Date"
+label="Due Date"
 value={formData.due_date_c}
               onChange={(e) => setFormData({ ...formData, due_date_c: e.target.value })}
+              required
+            />
+          </div>
+          <div>
+            <Input
+              type="date"
+              label="Expiry Date"
+              value={formData.expiry_date_c}
+              onChange={(e) => setFormData({ ...formData, expiry_date_c: e.target.value })}
               required
             />
           </div>

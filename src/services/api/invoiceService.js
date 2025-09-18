@@ -16,7 +16,8 @@ export const invoiceService = {
           {"field": {"Name": "number_c"}},
           {"field": {"Name": "status_c"}},
           {"field": {"Name": "issue_date_c"}},
-          {"field": {"Name": "due_date_c"}},
+{"field": {"Name": "due_date_c"}},
+          {"field": {"Name": "expiry_date_c"}},
           {"field": {"Name": "items_c"}},
           {"field": {"Name": "subtotal_c"}},
           {"field": {"Name": "tax_c"}},
@@ -61,15 +62,15 @@ export const invoiceService = {
           {"field": {"Name": "issue_date_c"}},
           {"field": {"Name": "due_date_c"}},
           {"field": {"Name": "items_c"}},
-          {"field": {"Name": "subtotal_c"}},
+{"field": {"Name": "subtotal_c"}},
           {"field": {"Name": "tax_c"}},
           {"field": {"Name": "total_c"}},
 {"field": {"Name": "notes_c"}},
           {"field": {"Name": "remarks_c"}},
+          {"field": {"Name": "expiry_date_c"}},
           {"field": {"Name": "Tags"}}
         ]
       }
-
       const response = await apperClient.getRecordById('invoice_c', id, params)
       
       if (!response?.data) {
@@ -97,9 +98,10 @@ export const invoiceService = {
           Name: invoiceData.number_c || `INV-${Date.now()}`,
           client_id_c: parseInt(invoiceData.client_id_c),
           number_c: invoiceData.number_c || `INV-${Date.now()}`,
-          status_c: invoiceData.status_c || "draft",
+status_c: invoiceData.status_c || "draft",
           issue_date_c: invoiceData.issue_date_c,
           due_date_c: invoiceData.due_date_c,
+          expiry_date_c: invoiceData.expiry_date_c,
           items_c: JSON.stringify(invoiceData.items_c || []),
           subtotal_c: parseFloat(invoiceData.subtotal_c) || 0,
           tax_c: parseFloat(invoiceData.tax_c) || 0,
@@ -160,8 +162,9 @@ notes_c: invoiceData.notes_c || "",
           client_id_c: parseInt(invoiceData.client_id_c),
           number_c: invoiceData.number_c,
           status_c: invoiceData.status_c,
-          issue_date_c: invoiceData.issue_date_c,
+issue_date_c: invoiceData.issue_date_c,
           due_date_c: invoiceData.due_date_c,
+          expiry_date_c: invoiceData.expiry_date_c,
           items_c: typeof invoiceData.items_c === 'string' ? invoiceData.items_c : JSON.stringify(invoiceData.items_c || []),
           subtotal_c: parseFloat(invoiceData.subtotal_c) || 0,
           tax_c: parseFloat(invoiceData.tax_c) || 0,
